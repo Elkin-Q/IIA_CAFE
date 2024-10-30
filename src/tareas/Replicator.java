@@ -1,14 +1,29 @@
 package tareas;
 
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-
-/**
- *
- * @author Jesús
- */
 public class Replicator {
+    
+    private Object elementoIN;
+    private Object elementoOUT;
+
+    public Object getElementoIN() {
+        return elementoIN;
+    }
+
+    public void setElementoIN(Object elementoIN) {
+        this.elementoIN = elementoIN;
+    }
+
+    public Object getElementoOUT() {
+        return elementoOUT;
+    }
+
+    public void setElementoOUT(Object elementoOUT) {
+        this.elementoOUT = elementoOUT;
+    }
+    
+    public void ejecutar(){
+        elementoOUT=elementoIN;
+    }
+    
     
 }
