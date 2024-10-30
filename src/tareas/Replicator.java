@@ -1,9 +1,12 @@
 package tareas;
 
+import java.util.ArrayList;
+
 public class Replicator {
     
     private Object elementoIN;
     private Object elementoOUT;
+    //private ArrayList<Object> eIN, eOUT;
 
     public Object getElementoIN() {
         return elementoIN;
