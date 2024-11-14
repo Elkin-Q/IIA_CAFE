@@ -1,20 +1,24 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
- */
 package cafe;
 
-/**
- *
- * @author elkin
- */
+import tasks.Replicator;
+
 public class Cafe {
 
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String[] args) {
-        // TODO code application logic here
+
+        FileConnector conector = new FileConnector();
+        conector.readFile("path_to_your_file.xml");
+        SolutionPort port = new SolutionPort();
+        conector.setPort(port);
+        Slot entrada = new Slot();
+        Slot salida = new Slot();
+        port.setEntrySlot(entrada);
+        Replicator replicator = new Replicator();
+        replicator.setEntrySlot(entrada);
+        replicator.setExitSlot(salida);
+        conector.sendDocument();
+        replicator.run();
+        salida.prueba();
     }
-    
+
 }
