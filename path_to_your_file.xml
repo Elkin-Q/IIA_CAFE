@@ -1,6 +1,16 @@
-<fileSystem>
-    <document>Documento 1</document>
-    <image>Imagen 1</image>
-    <document>Documento 2</document>
-    <note>Nota 1</note>
-</fileSystem>
+<cafe_order>
+    <drinks>
+        <drink>
+            <name>cafe</name>
+            <type>hot</type>
+        </drink>
+        <drink>
+            <name>chocolate</name>
+            <type>hot</type>
+        </drink>
+        <drink>
+            <name>coca-cola</name>
+            <type>cold</type>
+        </drink>
+    </drinks>
+</cafe_order>

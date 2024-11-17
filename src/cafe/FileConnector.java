@@ -5,14 +5,14 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 
-public class FileConnector extends Connector{
+public class FileConnector extends Connector {
 
     private Document document;
 
     public FileConnector() {
 
     }
-    
+
     public void processAndSendData(Slot slot) {
 
     }
@@ -37,8 +37,9 @@ public class FileConnector extends Connector{
     public void generateFile() {
 
     }
-    
-    public void sendDocument(){
+
+    public void sendDocument() {
         port.receiveDocument(document);
     }
+
 }
