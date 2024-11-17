@@ -27,19 +27,46 @@ public class Slot {
     public void receiveData(Object data) {
         buffer.add(data);
     }
-    
-    public void prueba(){
-        Document document = (Document) buffer.getFirst();
-        Element root = document.getDocumentElement();
-        NodeList childNodes = root.getChildNodes(); //Tengo mi documento separado en elementos
 
-        for (int i = 0; i < childNodes.getLength(); i++) {
-            Node node = childNodes.item(i);
-            if (node.getNodeType() == Node.ELEMENT_NODE) {
-                Element element = (Element) node;
-                Object data = element.getTextContent().trim();
-                if (data!=null) {
-                    System.out.println(data);
+    public void prueba() {
+
+        if (buffer.isEmpty()) {
+            System.out.println("El buffer está vacío.");
+        } else {
+
+            for (Object firstObject : buffer) {
+                if (firstObject instanceof Document) {
+                    Document document = (Document) firstObject;
+                    Element root = document.getDocumentElement();
+
+                    System.out.println("Comanda recibida: ");
+
+                    NodeList orderIdNodes = root.getElementsByTagName("order_id");
+                    if (orderIdNodes.getLength() > 0) {
+                        String orderId = orderIdNodes.item(0).getTextContent();
+                        System.out.println("Order ID: " + orderId);
+                    }
+
+                    NodeList drinksNodes = root.getElementsByTagName("drinks");
+                    for (int i = 0; i < drinksNodes.getLength(); i++) {
+                        Element drinksElement = (Element) drinksNodes.item(i);
+                        System.out.println("Bebidas: ");
+
+                        NodeList drinkNodes = drinksElement.getElementsByTagName("drink");
+                        for (int j = 0; j < drinkNodes.getLength(); j++) {
+                            Element drinkElement = (Element) drinkNodes.item(j);
+                            String drinkName = drinkElement.getElementsByTagName("name").item(0).getTextContent();
+                            String drinkType = drinkElement.getElementsByTagName("type").item(0).getTextContent();
+
+                            System.out.println("    Bebida: " + drinkName + " | Tipo: " + drinkType);
+                        }
+                    }
+                } else if (firstObject instanceof Element) {
+                    
+                    Element elemento = (Element) firstObject;
+                    System.out.println("Elemento recibido: " + elemento.getTagName() + " | Valor: " + elemento.getTextContent());
+                } else {
+                    System.out.println("El buffer no contiene un Document o Element. Buffer está vacío o contiene un tipo incorrecto.");
                 }
             }
         }
