@@ -22,7 +22,13 @@ import org.w3c.dom.NodeList;
 public class Agregator implements Task {
 
     private Slot entrySlot, exitSlot;
+    private XPathExpression exp, exp2;
 
+    public void setXPath(XPathExpression exp,XPathExpression exp2){
+        this.exp=exp;
+        this.exp=exp2;
+    }
+    
     public Slot getEntrySlot() {
         return entrySlot;
     }
@@ -42,11 +48,14 @@ public class Agregator implements Task {
     public Agregator() {
 
     }
+    
+    
 
-    public void run(XPathExpression exp, XPathExpression exp2) {
+    @Override
+    public void run() {
         try {
 
-            NodeList nl = (NodeList) exp.evaluate(entrySlot.getBuffer(), XPathConstants.NODESET);
+            NodeList nl = (NodeList) exp.evaluate(entrySlot.getBuffer().getFirst(), XPathConstants.NODESET);
 
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = dbFactory.newDocumentBuilder();
@@ -69,7 +78,7 @@ public class Agregator implements Task {
 
             for (int i = 0; i < tamaño; i++) {
 
-                NodeList nl2 = (NodeList) exp2.evaluate(entrySlot.getBuffer(), XPathConstants.NODESET);
+                NodeList nl2 = (NodeList) exp2.evaluate(entrySlot.getBuffer().getFirst(), XPathConstants.NODESET);
 
                 Node drink = nl2.item(0);
 

@@ -18,6 +18,14 @@ public class ContentEnrincher implements Task {
     private Slot EntrySlot2;
     private Slot ExitSlot;
 
+    private XPathExpression exp, exp2,exp3;
+     
+    public void setXPath(XPathExpression exp,XPathExpression exp2,XPathExpression exp3){
+        this.exp=exp;
+        this.exp=exp2;
+        this.exp=exp3;
+    }
+    
     public Slot getEntrySlot1() {
         return EntrySlot1;
     }
@@ -44,7 +52,8 @@ public class ContentEnrincher implements Task {
     public ContentEnrincher() {
     }
 
-    public void run(XPathExpression exp, XPathExpression exp2, XPathExpression exp3) {
+    @Override
+    public void run() {
         try {
 
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
