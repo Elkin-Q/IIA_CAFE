@@ -4,28 +4,33 @@ import org.w3c.dom.Document;
 
 public class Message {
     
-    private String tipo;
-    private String cuerpo; //Despues sera document
+    private InfoMessage head;
+    private Document data; //Despues sera document
 
-    public String getTitulo() {
-        return tipo;
+    public Message() {
     }
 
-    public void setTitulo(String tipo) {
-        this.tipo = tipo;
+    public Message(InfoMessage head, Document data) {
+        this.head = head;
+        this.data = data;
     }
 
-    public String getCuerpo() {
-        return cuerpo;
+    public InfoMessage getHead() {
+        return head;
     }
 
-    public void setCuerpo(String cuerpo) {
-        this.cuerpo = cuerpo;
+    public void setHead(InfoMessage head) {
+        this.head = head;
     }
 
-    public Message(String tipo, String cuerpo) {
-        this.tipo = tipo;
-        this.cuerpo = cuerpo;
+    public Document getData() {
+        return data;
     }
+
+    public void setData(Document data) {
+        this.data = data;
+    }
+
+    
     
 }
