@@ -1,6 +1,11 @@
 package cafe;
 
+import java.io.StringWriter;
 import java.util.ArrayList;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -39,32 +44,12 @@ public class Slot {
         } else {
 
             for (Object firstObject : buffer) {
-                if (firstObject instanceof Document) {
-                    Document document = (Document) firstObject;
+                if (firstObject instanceof Message) {
+                    Message message = (Message) firstObject;
+                    Document document = message.getData();
                     Element root = document.getDocumentElement();
+                    printDocument(document);
 
-                    System.out.println("Comanda recibida: ");
-
-                    NodeList orderIdNodes = root.getElementsByTagName("order_id");
-                    if (orderIdNodes.getLength() > 0) {
-                        String orderId = orderIdNodes.item(0).getTextContent();
-                        System.out.println("Order ID: " + orderId);
-                    }
-
-                    NodeList drinksNodes = root.getElementsByTagName("drinks");
-                    for (int i = 0; i < drinksNodes.getLength(); i++) {
-                        Element drinksElement = (Element) drinksNodes.item(i);
-                        System.out.println("Bebidas: ");
-
-                        NodeList drinkNodes = drinksElement.getElementsByTagName("drink");
-                        for (int j = 0; j < drinkNodes.getLength(); j++) {
-                            Element drinkElement = (Element) drinkNodes.item(j);
-                            String drinkName = drinkElement.getElementsByTagName("name").item(0).getTextContent();
-                            String drinkType = drinkElement.getElementsByTagName("type").item(0).getTextContent();
-
-                            System.out.println("    Bebida: " + drinkName + " | Tipo: " + drinkType);
-                        }
-                    }
                 } else if (firstObject instanceof Element) {
                     
                     Element elemento = (Element) firstObject;
@@ -75,5 +60,24 @@ public class Slot {
             }
         }
     }
+    
+    public void printDocument(Document document) {
+    try {
+        // Crear un transformador
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformerFactory.newTransformer();
+        transformer.setOutputProperty(javax.xml.transform.OutputKeys.INDENT, "yes");
+        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+
+        // Crear un StringWriter para capturar la salida
+        StringWriter writer = new StringWriter();
+        transformer.transform(new DOMSource(document), new StreamResult(writer));
+
+        // Imprimir el documento
+        System.out.println(writer.toString());
+    } catch (Exception e) {
+        System.out.println("Error al imprimir el documento: " + e.getMessage());
+    }
+}
 
 }

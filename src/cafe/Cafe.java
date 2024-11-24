@@ -15,6 +15,7 @@ public class Cafe {
 
         SolutionPort port = new SolutionPort();
         conector.setPort(port);
+        
 
         Slot entrada = new Slot();
         Slot salida = new Slot();
@@ -23,6 +24,7 @@ public class Cafe {
         Splitter splitter = new Splitter();
         splitter.setEntrySlot(entrada);
         splitter.setExitSlot(salida);
+        conector.sendDocument();
         splitter.run();
         salida.prueba();
         

@@ -53,7 +53,7 @@ public class Splitter implements Task {
 
             XPathFactory xPathFactory = XPathFactory.newInstance();
             XPath xpath = xPathFactory.newXPath();
-            NodeList drinkNodes = (NodeList) xpath.evaluate("/drinks/drink", document, XPathConstants.NODESET);
+            NodeList drinkNodes = (NodeList) xpath.evaluate("/cafe_order/drinks/drink", document, XPathConstants.NODESET);
 
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
