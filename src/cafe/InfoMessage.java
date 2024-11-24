@@ -4,14 +4,16 @@ public class InfoMessage {
     
     private long id, sequenceId, lenghtSequence;
 
-    public InfoMessage(long id, long sequenceId, long lenghtSequence) {
-        this.id = id;
+    public InfoMessage(long sequenceId, long lenghtSequence) {
+        IDGeneratorSingleton IDgenerator = IDGeneratorSingleton.getInstance();
+        this.id = IDgenerator.generateId();
         this.sequenceId = sequenceId;
         this.lenghtSequence = lenghtSequence;
     }
     
     public InfoMessage(){
-        
+        IDGeneratorSingleton IDgenerator = IDGeneratorSingleton.getInstance();
+        this.id = IDgenerator.generateId();
     }
     
     public long getId() {

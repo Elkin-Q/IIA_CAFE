@@ -7,28 +7,27 @@ import org.w3c.dom.Document;
 
 public class FileConnector extends Connector {
 
-    private Document document;
+    private Message message;
 
     public FileConnector() {
 
     }
 
-    public void processAndSendData(Slot slot) {
-
-    }
-
-    public Document getDocument() {
-        return document;
+    public Message getMessage() {
+        return message;
     }
 
     public void readFile(String dirFich) {
 
+        Document document;
+        
         try {
             File file = new File(dirFich); //ruta fichero xml
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             document = dBuilder.parse(file);
-            document.getDocumentElement().normalize(); //tranforma el fichero xml a un objeto document normalizado
+            document.getDocumentElement().normalize(); //tranforma el fichero xml a un objeto message normalizado
+            message = new Message(document);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -39,7 +38,7 @@ public class FileConnector extends Connector {
     }
 
     public void sendDocument() {
-        port.receiveDocument(document);
+        port.receiveDocument(message);
     }
 
 }

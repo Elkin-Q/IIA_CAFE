@@ -3,6 +3,7 @@ package cafe;
 import java.util.List;
 import tasks.Distributor;
 import tasks.Replicator;
+import tasks.Splitter;
 import tasks.Translator;
 
 public class Cafe {
@@ -16,8 +17,16 @@ public class Cafe {
         conector.setPort(port);
 
         Slot entrada = new Slot();
-        Slot salidahot = new Slot();
-        Slot salidacold = new Slot();
+        Slot salida = new Slot();
+ 
+        port.setEntrySlot(entrada);
+        Splitter splitter = new Splitter();
+        splitter.setEntrySlot(entrada);
+        splitter.setExitSlot(salida);
+        splitter.run();
+        salida.prueba();
+        
+        /*Slot salidacold = new Slot();
 
         port.setEntrySlot(entrada);
         Distributor distributor = new Distributor();
@@ -26,7 +35,7 @@ public class Cafe {
         distributor.addExitSlot(salidacold);
         distributor.definirReglasDistribucion("hot", List.of(0));  // "hot" a slot 0
         distributor.definirReglasDistribucion("cold", List.of(1)); // "cold" a slot 1
-
+*/
         /*
         Replicator replicator = new Replicator();
         replicator.setEntrySlot(entrada);

@@ -18,8 +18,8 @@ public class SolutionPort extends Port{
         this.entrySlot = entrySlot;
     }
     
-    public void receiveDocument(Document document){
-        entrySlot.receiveData(document);
+    public void receiveDocument(Message message){
+        entrySlot.receiveData(message);
     }
     
 }

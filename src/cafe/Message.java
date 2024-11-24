@@ -9,6 +9,11 @@ public class Message {
 
     public Message() {
     }
+    
+    public Message(Document document) {
+        this.data=document;
+        head = new InfoMessage();
+    }
 
     public Message(InfoMessage head, Document data) {
         this.head = head;
