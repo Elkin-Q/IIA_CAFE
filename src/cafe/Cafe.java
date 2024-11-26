@@ -2,6 +2,7 @@ package cafe;
 
 import java.util.List;
 import tasks.Distributor;
+import tasks.Merger;
 import tasks.Replicator;
 import tasks.Splitter;
 import tasks.Translator;
@@ -21,11 +22,22 @@ public class Cafe {
         Slot salida = new Slot();
  
         port.setEntrySlot(entrada);
-        Splitter splitter = new Splitter();
+        conector.sendDocument();
+        
+       /* Splitter splitter = new Splitter();
         splitter.setEntrySlot(entrada);
         splitter.setExitSlot(salida);
-        conector.sendDocument();
-        splitter.run();
+        splitter.run();*/
+       
+       Translator tranlator = new Translator();
+       tranlator.setAtribute("name");
+       tranlator.setEntrySlot(entrada);
+       tranlator.setExitSlot(salida);
+       tranlator.setTable("tabla");
+       tranlator.run();
+      
+        
+        
         salida.prueba();
         
         /*Slot salidacold = new Slot();

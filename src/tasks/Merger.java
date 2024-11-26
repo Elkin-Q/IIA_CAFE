@@ -36,39 +36,11 @@ public class Merger implements Task {
 
     @Override
     public void run() {
-        try {
-            ArrayList<Document> documentsIn = new ArrayList<>();
 
-            //se deberia de comprobar el id o algo para unir las que tengan sentido
-            for (int i = 0; i < EntrySlots.size(); i++) {
-                for (int j = 0; i < EntrySlots.get(i).bufferSize(); j++) {
-                    documentsIn.add((Document) EntrySlots.get(i).next());
-                }
+        for (Slot entrySlot : EntrySlots) {
+            for (int i = 0; i < entrySlot.bufferSize(); i++) {
+                ExitSlot.receiveData(entrySlot.next());
             }
-
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document mergedDocument = builder.newDocument();
-
-            Element root = mergedDocument.createElement("cafe_order");
-            Element drinks = mergedDocument.createElement("drinks");
-            mergedDocument.appendChild(root);
-            root.appendChild(drinks);
-
-            for (Document document : documentsIn) {
-                NodeList drinkNodes = document.getElementsByTagName("drink");
-
-                for (int i = 0; i < drinkNodes.getLength(); i++) {
-                    Node drinkNode = drinkNodes.item(i);
-                    Node importedNode = mergedDocument.importNode(drinkNode, true);
-                    drinks.appendChild(importedNode);
-                }
-            }
-            
-            ExitSlot.receiveData(mergedDocument);
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 

@@ -1,5 +1,6 @@
 package tasks;
 
+import cafe.Message;
 import cafe.Slot;
 import cafe.Task;
 import javax.xml.parsers.DocumentBuilder;
@@ -52,7 +53,8 @@ public class Translator implements Task {
     @Override
     public void run() {
 
-        Document input = (Document) entrySlot.next();
+        Message message = (Message) entrySlot.next();
+        Document input = message.getData();
 
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -75,7 +77,8 @@ public class Translator implements Task {
                 }
             }
             
-            exitSlot.receiveData(output);
+            message.setData(output);
+            exitSlot.receiveData(message);
 
         } catch (Exception e) {
             e.printStackTrace();
