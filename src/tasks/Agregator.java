@@ -4,12 +4,20 @@
  */
 package tasks;
 
+import cafe.IDGeneratorSingleton;
+import cafe.InfoMessage;
+import cafe.Message;
 import cafe.Slot;
 import cafe.Task;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -22,13 +30,16 @@ import org.w3c.dom.NodeList;
 public class Agregator implements Task {
 
     private Slot entrySlot, exitSlot;
-    private XPathExpression exp, exp2;
 
-    public void setXPath(XPathExpression exp,XPathExpression exp2){
-        this.exp=exp;
-        this.exp=exp2;
+    public Agregator() {
+
     }
-    
+
+    public Agregator(Slot entrySlot, Slot exitSlot) {
+        this.entrySlot = entrySlot;
+        this.exitSlot = exitSlot;
+    }
+
     public Slot getEntrySlot() {
         return entrySlot;
     }
@@ -45,55 +56,61 @@ public class Agregator implements Task {
         this.exitSlot = exitSlot;
     }
 
-    public Agregator() {
-
-    }
-    
-    
-
     @Override
     public void run() {
         try {
+            // Creo un map para guardar los nodos drink por id
+            Map<Long, List<Node>> drinkNodesMap = new HashMap<>();
+        
+            Message inputMessage;
+            while ((inputMessage = (Message) entrySlot.next()) != null) {
+                Document document = inputMessage.getData();
+                InfoMessage infoMessage = inputMessage.getHead();
+                long id = infoMessage.getId();
 
-            NodeList nl = (NodeList) exp.evaluate(entrySlot.getBuffer().getFirst(), XPathConstants.NODESET);
+                // Extraigo el nodo drink del mensaje
+                XPathFactory xPathFactory = XPathFactory.newInstance();
+                XPath xpath = xPathFactory.newXPath();
+                NodeList drinkNodes = (NodeList) xpath.evaluate("/drink", document, XPathConstants.NODESET);
 
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = dbFactory.newDocumentBuilder();
-            int tamaño = entrySlot.bufferSize();
-
-            Document aux = builder.newDocument();
-
-            //se crea un elemento raiz cafe_order en el nuevo documento y se agrega al documento
-            Element rootElement = aux.createElement("cafe_order");
-            aux.appendChild(rootElement);
-
-            //se crea un elemento order_id y se le asigna un valor obtenido del primer nodo de la lista
-            Element id = aux.createElement("order_id");
-            id.appendChild(aux.createTextNode(nl.item(0).getChildNodes().item(0).getTextContent()));
-            rootElement.appendChild(id);
-
-            //Se crea un elemento drinks que contendra las bebidas que se agregen más tarde
-            Element drs = aux.createElement("drinks");
-            rootElement.appendChild(drs);
-
-            for (int i = 0; i < tamaño; i++) {
-
-                NodeList nl2 = (NodeList) exp2.evaluate(entrySlot.getBuffer().getFirst(), XPathConstants.NODESET);
-
-                Node drink = nl2.item(0);
-
-                aux.adoptNode(drink);
-                drs.appendChild(drink);
-
-                entrySlot.next();
-
+                // Agrego el nodo extraido al map
+                List<Node> drinkList = drinkNodesMap.computeIfAbsent(id, k -> new ArrayList<>());
+                for (int i = 0; i < drinkNodes.getLength(); i++) {
+                    drinkList.add(drinkNodes.item(i));
+                }
             }
-            exitSlot.receiveData(aux);
 
-        } catch (Exception e) {
-            e.printStackTrace();
+            // Ahora, para cada id, reconstruyo el mensaje original
+        for (Map.Entry<Long, List<Node>> entry : drinkNodesMap.entrySet()) {
+            long id = entry.getKey();
+            List<Node> allDrinkNodes = entry.getValue();
+
+            // Creo un nuevo documento par reconstruir el documento original
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document newDocument = builder.newDocument();
+
+            // Creo la raiz <cafe_order>
+            Element cafeOrderElement = newDocument.createElement("cafe_order");
+            newDocument.appendChild(cafeOrderElement);
+
+            // creo <drinks> 
+            Element drinksElement = newDocument.createElement("drinks");
+            cafeOrderElement.appendChild(drinksElement);
+
+            // todos los nodos de drink los agrego a <drinks>
+            for (Node drinkNode : allDrinkNodes) {
+                Node importedNode = newDocument.importNode(drinkNode, true);
+                drinksElement.appendChild(importedNode);
+            }
+
+            // Creo un nuevo mensaje con el documento reconstruido
+            Message newMessage = new Message(new InfoMessage(id, allDrinkNodes.size()), newDocument);
+            exitSlot.receiveData(newMessage);
         }
 
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
     }
-
 }
