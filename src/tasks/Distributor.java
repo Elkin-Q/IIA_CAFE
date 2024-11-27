@@ -1,5 +1,7 @@
 package tasks;
 
+import cafe.InfoMessage;
+import cafe.Message;
 import cafe.Slot;
 import cafe.Task;
 import java.util.ArrayList;
@@ -45,29 +47,29 @@ public class Distributor implements Task {
 
     @Override
     public void run() {
-        Document documento = (Document) entrySlot.next();
-        NodeList nodos = documento.getElementsByTagName("drink");
+        int n = entrySlot.getBuffer().size(); // Número de mensajes en el slot de entrada
+        for (int i = 0; i < n; i++) {
+            Message message = (Message) entrySlot.next();
+            Document data = message.getData();
 
-        for (int i = 0; i < nodos.getLength(); i++) {
-            if (nodos.item(i).getNodeType() == Node.ELEMENT_NODE) {
-                Element elemento = (Element) nodos.item(i);
-                String tagName = elemento.getTagName();
+            // Procesar el Document
+            Element drinkElement = data.getDocumentElement(); // Obtener el nodo raíz
+            String type = drinkElement.getElementsByTagName("type").item(0).getTextContent().trim(); // Obtener el tipo de bebida
 
-                // Verificar el valor de 'type' dentro del 'drink'
-                String type = elemento.getElementsByTagName("type").item(0).getTextContent().trim();
+            if (reglasDistribucion.containsKey(type)) {
+                List<Integer> slotsAsignados = reglasDistribucion.get(type);
 
-                if (reglasDistribucion.containsKey(type)) {
-                    List<Integer> slotsAsignados = reglasDistribucion.get(type);
-                    for (Integer slotIndex : slotsAsignados) {
-                        if (slotIndex < exitSlot.size()) {
-                            exitSlot.get(slotIndex).receiveData(elemento);
-                        }
-                    }
-                } else {
-                    System.out.println("No se encontró regla de distribución para el tipo: " + type);
+                for (Integer slotIndex : slotsAsignados) {
+                    // crear un nuevo mensaje
+                    Message newMessage = new Message(new InfoMessage(), data);
+                    // enviar el mensaje al slot correspondiente
+                    exitSlot.get(slotIndex).receiveData(newMessage);
+                    System.out.println("Mensaje enviado a slot " + slotIndex);
                 }
+            } else {
+                System.out.println("No se encontró regla de distribución para el tipo: " + type);
             }
         }
-    }
 
+    }
 }
