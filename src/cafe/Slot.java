@@ -22,6 +22,10 @@ public class Slot {
     public ArrayList<Object> getBuffer() {
         return buffer;
     }
+    
+    public boolean isEmpty(){
+        return buffer.isEmpty();
+    }
 
     public Object next() {
         Object next = buffer.getFirst();

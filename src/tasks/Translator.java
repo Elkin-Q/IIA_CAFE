@@ -52,36 +52,37 @@ public class Translator implements Task {
 
     @Override
     public void run() {
+        while (!entrySlot.isEmpty()) {
+            Message message = (Message) entrySlot.next();
+            Document input = message.getData();
 
-        Message message = (Message) entrySlot.next();
-        Document input = message.getData();
+            try {
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                Document output = builder.newDocument();
 
-        try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document output = builder.newDocument();
+                Element sqlElement = output.createElement("sql");
+                output.appendChild(sqlElement);
 
-            Element sqlElement = output.createElement("sql");
-            output.appendChild(sqlElement);
+                NodeList atributeNodes = input.getElementsByTagName(atribute);
 
-            NodeList atributeNodes = input.getElementsByTagName(atribute);
+                for (int i = 0; i < atributeNodes.getLength(); i++) {
+                    Node node = atributeNodes.item(i);
 
-            for (int i = 0; i < atributeNodes.getLength(); i++) {
-                Node node = atributeNodes.item(i);
-
-                if (node.getNodeType() == Node.ELEMENT_NODE) {
-                    String atributeValue = node.getTextContent();
-                    Element qElement = output.createElement("query");
-                    qElement.setTextContent("SELECT * FROM "+ table +" WHERE "+ atribute +" = '" + atributeValue + "'");
-                    sqlElement.appendChild(qElement);
+                    if (node.getNodeType() == Node.ELEMENT_NODE) {
+                        String atributeValue = node.getTextContent();
+                        Element qElement = output.createElement("query");
+                        qElement.setTextContent("SELECT * FROM " + table + " WHERE " + atribute + " = '" + atributeValue + "'");
+                        sqlElement.appendChild(qElement);
+                    }
                 }
-            }
-            
-            message.setData(output);
-            exitSlot.receiveData(message);
 
-        } catch (Exception e) {
-            e.printStackTrace();
+                message.setData(output);
+                exitSlot.receiveData(message);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 

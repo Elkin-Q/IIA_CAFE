@@ -31,6 +31,7 @@ public class Distributor implements Task {
     public Distributor(Slot entrySlot, ArrayList<Slot> exitSlot) {
         this.entrySlot = entrySlot;
         this.exitSlot = exitSlot;
+         this.reglasDistribucion = new HashMap<>();
     }
 
     public Slot getEntrySlot() {
