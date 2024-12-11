@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<cafe_order>
+    <drinks>
+        <drink>
+                        
+            <name>cafe</name>
+                        
+            <type>hot</type>
+                    
+            <stock>3</stock>
+        </drink>
+        <drink>
+                        
+            <name>chocolate</name>
+                        
+            <type>hot</type>
+                    
+            <stock>5</stock>
+        </drink>
+        <drink>
+                        
+            <name>coca-cola</name>
+                        
+            <type>cold</type>
+                    
+            <stock>0</stock>
+        </drink>
+    </drinks>
+</cafe_order>

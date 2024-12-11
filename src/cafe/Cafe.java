@@ -2,6 +2,7 @@ package cafe;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.w3c.dom.Document;
 import tasks.*;
 
 public class Cafe {
@@ -16,6 +17,8 @@ public class Cafe {
 
         FileConnector conectorCold = new FileConnector();
         conectorCold.readFile("BDCC.xml");
+
+        FileConnector exitConector = new FileConnector();
 
         SolutionPort port = new SolutionPort();
         conector.setPort(port);
@@ -141,21 +144,21 @@ public class Cafe {
         coorrelatorHot.setEntrySlots(entradasCoorHot);
         coorrelatorHot.setExitSlots(salidasCoorHot);
         coorrelatorHot.run();
-        
+
         //coorrelator frias
         Coorrelator coorrelatorCold = new Coorrelator();
         coorrelatorCold.setEntrySlots(entradasCoorCold);
         coorrelatorCold.setExitSlots(salidasCoorCold);
         coorrelatorCold.run();
-        
+
         System.out.println("Salidas del coorrelator");
         salidaCoorHot1.prueba();
         salidaCoorHot2.prueba();
-        
+
         System.out.println("Salidas del coorrelator frio");
         salidaCoorCold1.prueba();
         salidaCoorCold2.prueba();
-        
+
         //******************** tareas Content enrinchment *********************
         //Content enrinchment hot
         ContentEnrincher contentHot = new ContentEnrincher();
@@ -165,7 +168,7 @@ public class Cafe {
         contentHot.run();
         System.out.println("Salida Enricher");
         salidaContentHot.prueba();
-        
+
         //Content enrinchment Cold
         ContentEnrincher contentCold = new ContentEnrincher();
         contentCold.setEntrySlot1(salidaCoorCold1);
@@ -180,18 +183,21 @@ public class Cafe {
         merger.setEntrySlots(entradasMerger);
         merger.setExitSlot(salidaMerger);
         merger.run();
-        
+
         System.out.println("Salida Merger");
         salidaMerger.prueba();
-        
+
         //******************** tareas Agregator *********************
         Agregator agregator = new Agregator();
         agregator.setEntrySlot(salidaMerger);
         agregator.setExitSlot(salidaAgregator);
         agregator.run();
-        
+
         System.out.println("Salida Agregator");
         salidaAgregator.prueba();
+
+        Message exitMessage =  (Message) salidaAgregator.next();
+        exitConector.generateFile(exitMessage.getData(), "solucion1");
     }
 
 }
