@@ -2,11 +2,7 @@ package cafe;
 
 import java.util.ArrayList;
 import java.util.List;
-import tasks.Distributor;
-import tasks.Merger;
-import tasks.Replicator;
-import tasks.Splitter;
-import tasks.Translator;
+import tasks.*;
 
 public class Cafe {
 
@@ -16,10 +12,10 @@ public class Cafe {
         conector.readFile("path_to_your_file.xml");
 
         FileConnector conectorHot = new FileConnector();
-        conector.readFile("BDcafe.xml");
+        conectorHot.readFile("BDcafe.xml");
 
         FileConnector conectorCold = new FileConnector();
-        conector.readFile("BDCC.xml");
+        conectorCold.readFile("BDCC.xml");
 
         SolutionPort port = new SolutionPort();
         conector.setPort(port);
@@ -53,13 +49,30 @@ public class Cafe {
 
         Slot salidaBDHot = new Slot();
         Slot salidaBDCold = new Slot();
+        ArrayList<Slot> entradasCoorHot = new ArrayList<>();
+        entradasCoorHot.add(salidaBDHot);
+        entradasCoorHot.add(salidaRepHot2);
+        ArrayList<Slot> entradasCoorCold = new ArrayList<>();
+        entradasCoorCold.add(salidaBDCold);
+        entradasCoorCold.add(salidaRepCold2);
+
+        Slot salidaCoorHot1 = new Slot();
+        Slot salidaCoorHot2 = new Slot();
+        Slot salidaCoorCold1 = new Slot();
+        Slot salidaCoorCold2 = new Slot();
+        ArrayList<Slot> salidasCoorHot = new ArrayList<>();
+        salidasCoorHot.add(salidaCoorHot1);
+        salidasCoorHot.add(salidaCoorHot2);
+        ArrayList<Slot> salidasCoorCold = new ArrayList<>();
+        salidasCoorCold.add(salidaCoorCold1);
+        salidasCoorCold.add(salidaCoorCold2);
 
         port.setEntrySlot(entradaComandas);
         conector.sendDocument();
 
         portDBHot.setEntrySlot(salidaBDHot);
         conectorHot.sendDocument();
-        conector.readFile("BDchocolate.xml");
+        conectorHot.readFile("BDchocolate.xml");
         conectorHot.sendDocument();
 
         portDBCold.setEntrySlot(salidaBDCold);
@@ -114,6 +127,31 @@ public class Cafe {
         consultaHot.prueba();
         System.out.println("Consulta Frio: ");
         consultaCold.prueba();
+
+        //******************* tareas coorrelator *****************************
+        //coorrelator calientes
+        Coorrelator coorrelatorHot = new Coorrelator();
+        coorrelatorHot.setEntrySlots(entradasCoorHot);
+        coorrelatorHot.setExitSlots(salidasCoorHot);
+        coorrelatorHot.run();
+        
+        //coorrelator frias
+        Coorrelator coorrelatorCold = new Coorrelator();
+        coorrelatorCold.setEntrySlots(entradasCoorCold);
+        coorrelatorCold.setExitSlots(salidasCoorCold);
+        coorrelatorCold.run();
+        
+        System.out.println("Salidas del coorrelator");
+        salidaCoorHot1.prueba();
+        salidaCoorHot2.prueba();
+        
+        //******************** tareas Content enrinchment *********************
+        //Content enrinchment hot
+        
+        
+        //Content enrinchment Cold
+        
+
     }
 
 }
