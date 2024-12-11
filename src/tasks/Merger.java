@@ -38,7 +38,8 @@ public class Merger implements Task {
     public void run() {
 
         for (Slot entrySlot : EntrySlots) {
-            for (int i = 0; i < entrySlot.bufferSize(); i++) {
+            int tamaño = entrySlot.bufferSize();
+            for (int i = 0; i < tamaño; i++) {
                 ExitSlot.receiveData(entrySlot.next());
             }
         }
