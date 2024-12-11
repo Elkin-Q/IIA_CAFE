@@ -66,6 +66,13 @@ public class Cafe {
         ArrayList<Slot> salidasCoorCold = new ArrayList<>();
         salidasCoorCold.add(salidaCoorCold1);
         salidasCoorCold.add(salidaCoorCold2);
+        Slot salidaContentHot = new Slot();
+        Slot salidaContentCold = new Slot();
+        ArrayList<Slot> entradasMerger = new ArrayList<>();
+        entradasMerger.add(salidaContentHot);
+        entradasMerger.add(salidaContentCold);
+        Slot salidaMerger = new Slot();
+        Slot salidaAgregator = new Slot();
 
         port.setEntrySlot(entradaComandas);
         conector.sendDocument();
@@ -145,13 +152,46 @@ public class Cafe {
         salidaCoorHot1.prueba();
         salidaCoorHot2.prueba();
         
+        System.out.println("Salidas del coorrelator frio");
+        salidaCoorCold1.prueba();
+        salidaCoorCold2.prueba();
+        
         //******************** tareas Content enrinchment *********************
         //Content enrinchment hot
-        
+        ContentEnrincher contentHot = new ContentEnrincher();
+        contentHot.setEntrySlot1(salidaCoorHot1);
+        contentHot.setEntrySlot2(salidaCoorHot2);
+        contentHot.setExitSlot(salidaContentHot);
+        contentHot.run();
+        System.out.println("Salida Enricher");
+        salidaContentHot.prueba();
         
         //Content enrinchment Cold
-        
+        ContentEnrincher contentCold = new ContentEnrincher();
+        contentCold.setEntrySlot1(salidaCoorCold1);
+        contentCold.setEntrySlot2(salidaCoorCold2);
+        contentCold.setExitSlot(salidaContentCold);
+        contentCold.run();
+        System.out.println("Salida Enricher Cold");
+        salidaContentCold.prueba();
 
+        //******************** tareas Merger *********************
+        Merger merger = new Merger();
+        merger.setEntrySlots(entradasMerger);
+        merger.setExitSlot(salidaMerger);
+        merger.run();
+        
+        System.out.println("Salida Merger");
+        salidaMerger.prueba();
+        
+        //******************** tareas Agregator *********************
+        Agregator agregator = new Agregator();
+        agregator.setEntrySlot(salidaMerger);
+        agregator.setExitSlot(salidaAgregator);
+        agregator.run();
+        
+        System.out.println("Salida Agregator");
+        salidaAgregator.prueba();
     }
 
 }
