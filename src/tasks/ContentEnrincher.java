@@ -1,16 +1,21 @@
 package tasks;
 
+import cafe.Message;
 import cafe.Slot;
 import cafe.Task;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
 
 public class ContentEnrincher implements Task {
 
@@ -18,14 +23,9 @@ public class ContentEnrincher implements Task {
     private Slot EntrySlot2;
     private Slot ExitSlot;
 
-    private XPathExpression exp, exp2,exp3;
-     
-    public void setXPath(XPathExpression exp,XPathExpression exp2,XPathExpression exp3){
-        this.exp=exp;
-        this.exp=exp2;
-        this.exp=exp3;
+    public ContentEnrincher() {
     }
-    
+
     public Slot getEntrySlot1() {
         return EntrySlot1;
     }
@@ -33,7 +33,7 @@ public class ContentEnrincher implements Task {
     public void setEntrySlot1(Slot entrySlot) {
         this.EntrySlot1 = entrySlot;
     }
-    
+
     public Slot getEntrySlot2() {
         return EntrySlot2;
     }
@@ -49,47 +49,38 @@ public class ContentEnrincher implements Task {
     public void setExitSlot(Slot ExitSlot) {
         this.ExitSlot = ExitSlot;
     }
-    public ContentEnrincher() {
-    }
 
     @Override
     public void run() {
-        try {
-
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = dbFactory.newDocumentBuilder();
-            int tamaño = EntrySlot1.bufferSize();
-            for (int i = 0; i < tamaño; i++) {
-                Document aux = builder.newDocument();
-
-                Element rootElement = aux.createElement("mensaje");
-                aux.appendChild(rootElement);
-
-                NodeList nl = (NodeList) exp.evaluate(EntrySlot1.getBuffer(), XPathConstants.NODESET);
-                NodeList nl2 = (NodeList) exp2.evaluate(EntrySlot1.getBuffer(), XPathConstants.NODESET);
-                NodeList nl3 = (NodeList) exp3.evaluate(EntrySlot2.getBuffer(), XPathConstants.NODESET);
-
-                Node cabecera = nl.item(0);
-                Node drink = nl2.item(0);
-                Node stock = nl3.item(0);
-
-                aux.adoptNode(cabecera);
-                rootElement.appendChild(cabecera);
-
-                aux.adoptNode(drink);
-                rootElement.appendChild(drink);
-
-                aux.adoptNode(stock);
-                drink.appendChild(stock);
-
-                ExitSlot.receiveData(aux);
-                EntrySlot1.next();
-                EntrySlot2.next();
+        int tamaño = EntrySlot1.bufferSize();
+        
+        for(int i=0; i<tamaño; i++){
+            Message mensaje1 = (Message) EntrySlot1.next();
+            Message mensaje2 = (Message) EntrySlot2.next();
+            
+            XPath xpath = XPathFactory.newInstance().newXPath();
+            NodeList stock = null;
+            
+            try {
+                stock = (NodeList) xpath.compile("//stock").evaluate(mensaje1.getData(), XPathConstants.NODESET);
+            } catch (XPathExpressionException ex) {
+                Logger.getLogger(ContentEnrincher.class.getName()).log(Level.SEVERE, null, ex);
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+            
+            Node s = stock.item(0);
+            Element elemento = (Element) s;
+            String nstock = elemento.getTextContent();
+            System.out.println("El estock es:" + nstock);
+            
+            Document doc = mensaje2.getData();
+            Element newElement = doc.createElement("stock");
+            newElement.appendChild(doc.createTextNode(nstock));
+            Node Drink = doc.getElementsByTagName("drink").item(0);
+            Drink.appendChild(newElement);
+            
+            Message salida = new Message(mensaje2.getHead(), doc);
+            ExitSlot.receiveData(salida);
         }
     }
-    
+
 }

@@ -4,7 +4,6 @@
  */
 package tasks;
 
-import cafe.IDGeneratorSingleton;
 import cafe.InfoMessage;
 import cafe.Message;
 import cafe.Slot;
@@ -61,12 +60,13 @@ public class Agregator implements Task {
         try {
             // Creo un map para guardar los nodos drink por id
             Map<Long, List<Node>> drinkNodesMap = new HashMap<>();
-        
-            Message inputMessage;
-            while ((inputMessage = (Message) entrySlot.next()) != null) {
+            
+            while(entrySlot.bufferSize()!=0) {
+                
+                Message inputMessage = (Message) entrySlot.next();
                 Document document = inputMessage.getData();
                 InfoMessage infoMessage = inputMessage.getHead();
-                long id = infoMessage.getId();
+                long id_sequency = infoMessage.getSequenceId();
 
                 // Extraigo el nodo drink del mensaje
                 XPathFactory xPathFactory = XPathFactory.newInstance();
@@ -74,7 +74,7 @@ public class Agregator implements Task {
                 NodeList drinkNodes = (NodeList) xpath.evaluate("/drink", document, XPathConstants.NODESET);
 
                 // Agrego el nodo extraido al map
-                List<Node> drinkList = drinkNodesMap.computeIfAbsent(id, k -> new ArrayList<>());
+                List<Node> drinkList = drinkNodesMap.computeIfAbsent(id_sequency, k -> new ArrayList<>());
                 for (int i = 0; i < drinkNodes.getLength(); i++) {
                     drinkList.add(drinkNodes.item(i));
                 }
