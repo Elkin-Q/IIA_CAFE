@@ -11,6 +11,9 @@ public class Cafe {
 
         FileConnector conector = new FileConnector();
         conector.readFile("path_to_your_file.xml");
+        
+        DBConnector conectoDB = new DBConnector();
+        conectoDB.conexion();
 
         FileConnector conectorHot = new FileConnector();
         conectorHot.readFile("BDcafe.xml");
