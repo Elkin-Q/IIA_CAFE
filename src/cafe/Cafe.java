@@ -12,8 +12,8 @@ public class Cafe {
         FileConnector conector = new FileConnector();
         conector.readFile("path_to_your_file.xml");
         
-        DBConnector conectoDB = new DBConnector();
-        conectoDB.conexion();
+        DBConnector conectorDB = new DBConnector();
+        conectorDB.connect();
 
         FileConnector conectorHot = new FileConnector();
         conectorHot.readFile("BDcafe.xml");
@@ -201,6 +201,8 @@ public class Cafe {
 
         Message exitMessage =  (Message) salidaAgregator.next();
         exitConector.generateFile(exitMessage.getData(), "solucion1");
+        
+        conectorDB.disconnect();
     }
 
 }
