@@ -14,6 +14,11 @@ public class Cafe {
         
         DBConnector conectorDB = new DBConnector();
         conectorDB.connect();
+        
+        System.out.println("********* PRUEBA DE LA BD ********");
+        Slot pruebaDB = new Slot();
+        Document prueba = conectorDB.consultMake("cafe");
+        pruebaDB.printDocument(prueba);
 
         FileConnector conectorHot = new FileConnector();
         conectorHot.readFile("BDcafe.xml");
