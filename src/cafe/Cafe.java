@@ -192,6 +192,7 @@ public class Cafe {
         
         System.out.println("Salida Agregator");
         salidaAgregator.prueba();
+        
     }
 
 }
