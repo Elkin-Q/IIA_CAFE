@@ -12,19 +12,16 @@ public class Cafe {
         FileConnector conector = new FileConnector();
         conector.readFile("path_to_your_file.xml");
         
-        DBConnector conectorDB = new DBConnector();
-        conectorDB.connect();
+        DBConnector conectorDBHot = new DBConnector();
+        conectorDBHot.connect();
         
-        System.out.println("********* PRUEBA DE LA BD ********");
+        DBConnector conectorDBCold = new DBConnector();
+        conectorDBCold.connect();
+        
+       /* System.out.println("********* PRUEBA DE LA BD ********");
         Slot pruebaDB = new Slot();
         Document prueba = conectorDB.consultMake("cafe");
-        pruebaDB.printDocument(prueba);
-
-        FileConnector conectorHot = new FileConnector();
-        conectorHot.readFile("BDcafe.xml");
-
-        FileConnector conectorCold = new FileConnector();
-        conectorCold.readFile("BDCC.xml");
+        pruebaDB.printDocument(prueba);*/
 
         FileConnector exitConector = new FileConnector();
 
@@ -32,10 +29,10 @@ public class Cafe {
         conector.setPort(port);
 
         SolutionPort portDBHot = new SolutionPort();
-        conectorHot.setPort(portDBHot);
-
+        conectorDBHot.setPort(portDBHot);
+        
         SolutionPort portDBCold = new SolutionPort();
-        conectorCold.setPort(portDBCold);
+        conectorDBCold.setPort(portDBCold);
 
         //declaracion de slots
         Slot entradaComandas = new Slot();
@@ -89,12 +86,7 @@ public class Cafe {
         conector.sendDocument();
 
         portDBHot.setEntrySlot(salidaBDHot);
-        conectorHot.sendDocument();
-        conectorHot.readFile("BDchocolate.xml");
-        conectorHot.sendDocument();
-
         portDBCold.setEntrySlot(salidaBDCold);
-        conectorCold.sendDocument();
 
         //tarea spliter
         Splitter splitter = new Splitter(entradaComandas, salidaSpliter);
@@ -129,7 +121,7 @@ public class Cafe {
         Translator transHot = new Translator();
         transHot.setEntrySlot(salidaRepHot1);
         transHot.setExitSlot(consultaHot);
-        transHot.setTable("hotDrinks");
+        transHot.setTable("HotDrinks");
         transHot.setAtribute("name");
         transHot.run();
 
@@ -137,7 +129,7 @@ public class Cafe {
         Translator transCold = new Translator();
         transCold.setEntrySlot(salidaRepCold1);
         transCold.setExitSlot(consultaCold);
-        transCold.setTable("coldDrinks");
+        transCold.setTable("ColdDrinks");
         transCold.setAtribute("name");
         transCold.run();
 
@@ -145,7 +137,28 @@ public class Cafe {
         consultaHot.prueba();
         System.out.println("Consulta Frio: ");
         consultaCold.prueba();
+        
+        //**************** Realizar consultas a la BD ************************
+        int tamHot = consultaHot.getBuffer().size();
+        Message messageH;
+        for (int i = 0; i < tamHot; i++) {
+            messageH = (Message) consultaHot.next();
+            conectorDBHot.consult(messageH.getData());
+        }
+        
+        int tamCold = consultaCold.getBuffer().size();
+        Message messageC;
+        for (int i = 0; i < tamCold; i++) {
+            messageC = (Message) consultaCold.next();
+            conectorDBCold.consult(messageC.getData());
+        }
+        
 
+        System.out.println("\nSALIDAS DE LA BD Caliente");
+        salidaBDHot.prueba();
+        System.out.println("\nSALIDAS DE LA BD Frio");
+        salidaBDCold.prueba();
+       
         //******************* tareas coorrelator *****************************
         //coorrelator calientes
         Coorrelator coorrelatorHot = new Coorrelator();
@@ -207,7 +220,8 @@ public class Cafe {
         Message exitMessage =  (Message) salidaAgregator.next();
         exitConector.generateFile(exitMessage.getData(), "solucion1");
         
-        conectorDB.disconnect();
+        conectorDBHot.disconnect();
+        conectorDBCold.disconnect();
     }
 
 }

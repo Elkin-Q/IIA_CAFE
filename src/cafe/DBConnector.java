@@ -42,52 +42,56 @@ public class DBConnector extends Connector {
         }
     }
 
-    public Document consultMake(String nombre) {
+    public void consult(Document inputDoc) {
         Document doc = null;
-        try{
-        Statement stmt = (Statement) conn.createStatement();
-        ResultSet rs = stmt.executeQuery("SELECT * FROM HotDrinks WHERE name= '" + nombre + "'");
-           
-        if (rs.next()) {
-            String name = rs.getString("name");
-            int stock = rs.getInt("stock");
+        try {
+            Element root = inputDoc.getDocumentElement();
+            String query = root.getElementsByTagName("query").item(0).getTextContent();
 
-            // Crear documento XML
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            doc = dBuilder.newDocument();
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
 
-            // Elemento raíz
-            Element rootElement = doc.createElement("drink");
-            doc.appendChild(rootElement);
+            if (rs.next()) {
+                String name = rs.getString("name");
+                int stock = rs.getInt("stock");
 
-            // Elemento nombre
-            Element nameElement = doc.createElement("name");
-            nameElement.appendChild(doc.createTextNode(name));
-            rootElement.appendChild(nameElement);
+                // Crear documento XML
+                DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+                doc = dBuilder.newDocument();
 
-            // Elemento stock
-            Element stockElement = doc.createElement("stock");
-            stockElement.appendChild(doc.createTextNode(String.valueOf(stock)));
-            rootElement.appendChild(stockElement);
+                // Elemento raíz
+                Element rootElement = doc.createElement("drink");
+                doc.appendChild(rootElement);
 
-            // Imprimir XML
-            javax.xml.transform.TransformerFactory transformerFactory = javax.xml.transform.TransformerFactory.newInstance();
-            javax.xml.transform.Transformer transformer = transformerFactory.newTransformer();
-            javax.xml.transform.dom.DOMSource source = new javax.xml.transform.dom.DOMSource(doc);
-            javax.xml.transform.stream.StreamResult result = new javax.xml.transform.stream.StreamResult(System.out);
-            transformer.transform(source, result);
-        } else {
-            System.out.println("No se encontraron resultados.");
-        }
-        rs.close();
-        stmt.close();
-        return doc;
-        }catch (SQLException ex){
+                // Elemento nombre
+                Element nameElement = doc.createElement("name");
+                nameElement.appendChild(doc.createTextNode(name));
+                rootElement.appendChild(nameElement);
+
+                // Elemento stock
+                Element stockElement = doc.createElement("stock");
+                stockElement.appendChild(doc.createTextNode(String.valueOf(stock)));
+                rootElement.appendChild(stockElement);
+
+                // Imprimir XML
+                javax.xml.transform.TransformerFactory transformerFactory = javax.xml.transform.TransformerFactory.newInstance();
+                javax.xml.transform.Transformer transformer = transformerFactory.newTransformer();
+                javax.xml.transform.dom.DOMSource source = new javax.xml.transform.dom.DOMSource(doc);
+                javax.xml.transform.stream.StreamResult result = new javax.xml.transform.stream.StreamResult(System.out);
+                transformer.transform(source, result);
+            } else {
+                System.out.println("No se encontraron resultados.");
+            }
+            rs.close();
+            stmt.close();
+            if (doc != null) {
+                Message message = new Message(doc);
+                port.receiveDocument(message);
+            }
+        } catch (Exception ex) {
             System.out.println("Error al realizar la consulta: ");
             ex.printStackTrace();
-        }finally{
-        return doc;
         }
     }
 }

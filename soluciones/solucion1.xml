@@ -15,7 +15,7 @@
                         
             <type>hot</type>
                     
-            <stock>5</stock>
+            <stock>0</stock>
         </drink>
         <drink>
                         
@@ -23,7 +23,7 @@
                         
             <type>cold</type>
                     
-            <stock>0</stock>
+            <stock>7</stock>
         </drink>
     </drinks>
 </cafe_order>
