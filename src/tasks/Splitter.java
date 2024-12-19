@@ -3,6 +3,7 @@ package tasks;
 import cafe.IDGeneratorSingleton;
 import cafe.InfoMessage;
 import cafe.Message;
+import cafe.OrderStruct;
 import cafe.Slot;
 import cafe.Task;
 import java.util.logging.Level;
@@ -19,8 +20,18 @@ import javax.xml.parsers.DocumentBuilderFactory;
 public class Splitter implements Task {
 
     private Slot entrySlot, exitSlot;
+    private OrderStruct struct;
 
     public Splitter() {
+        
+    }
+
+    public OrderStruct getStruct() {
+        return struct;
+    }
+
+    public void setStruct(OrderStruct struct) {
+        this.struct = struct;
     }
 
     public Splitter(Slot entrySlot, Slot exitSlot) {
@@ -49,6 +60,7 @@ public class Splitter implements Task {
 
         try {
             Message input_message = (Message) entrySlot.next();
+            struct.saveStruct(input_message);
             Document document = input_message.getData();
 
             XPathFactory xPathFactory = XPathFactory.newInstance();

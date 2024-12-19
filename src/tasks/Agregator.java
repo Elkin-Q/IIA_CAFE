@@ -1,13 +1,11 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package tasks;
 
 import cafe.InfoMessage;
 import cafe.Message;
+import cafe.OrderStruct;
 import cafe.Slot;
 import cafe.Task;
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,13 +20,18 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-/**
- *
- * @author elkin
- */
 public class Agregator implements Task {
 
     private Slot entrySlot, exitSlot;
+    private OrderStruct struct;
+
+    public OrderStruct getStruct() {
+        return struct;
+    }
+
+    public void setStruct(OrderStruct struct) {
+        this.struct = struct;
+    }
 
     public Agregator() {
 
@@ -58,59 +61,46 @@ public class Agregator implements Task {
     @Override
     public void run() {
         try {
-            // Creo un map para guardar los nodos drink por id
-            Map<Long, List<Node>> drinkNodesMap = new HashMap<>();
-            
-            while(entrySlot.bufferSize()!=0) {
-                
-                Message inputMessage = (Message) entrySlot.next();
-                Document document = inputMessage.getData();
-                InfoMessage infoMessage = inputMessage.getHead();
-                long id_sequency = infoMessage.getSequenceId();
 
-                // Extraigo el nodo drink del mensaje
+            // Parsear la estructura base a un documento
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document baseDocument = struct.getOrderStruct().getData();
+
+            // Crear o buscar el elemento <drinks> en la estructura base
+            Element drinksElement = (Element) baseDocument.getElementsByTagName("drinks").item(0);
+            if (drinksElement == null) {
+                drinksElement = baseDocument.createElement("drinks");
+                baseDocument.getDocumentElement().appendChild(drinksElement);
+            }
+
+            // Procesar mensajes de entrada y agregar nodos <drink> al elemento <drinks>
+            while (entrySlot.bufferSize() != 0) {
+                Message inputMessage = (Message) entrySlot.next();
+                if (inputMessage == null) {
+                    continue;
+                }
+
+                Document document = inputMessage.getData();
                 XPathFactory xPathFactory = XPathFactory.newInstance();
                 XPath xpath = xPathFactory.newXPath();
-                NodeList drinkNodes = (NodeList) xpath.evaluate("/drink", document, XPathConstants.NODESET);
 
-                // Agrego el nodo extraido al map
-                List<Node> drinkList = drinkNodesMap.computeIfAbsent(id_sequency, k -> new ArrayList<>());
+                // Extraer nodos <drink>
+                NodeList drinkNodes = (NodeList) xpath.evaluate("/drink", document, XPathConstants.NODESET);
                 for (int i = 0; i < drinkNodes.getLength(); i++) {
-                    drinkList.add(drinkNodes.item(i));
+                    Node drinkNode = drinkNodes.item(i);
+                    Node importedNode = baseDocument.importNode(drinkNode, true);
+                    drinksElement.appendChild(importedNode);
                 }
             }
 
-            // Ahora, para cada id, reconstruyo el mensaje original
-        for (Map.Entry<Long, List<Node>> entry : drinkNodesMap.entrySet()) {
-            long id = entry.getKey();
-            List<Node> allDrinkNodes = entry.getValue();
-
-            // Creo un nuevo documento par reconstruir el documento original
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document newDocument = builder.newDocument();
-
-            // Creo la raiz <cafe_order>
-            Element cafeOrderElement = newDocument.createElement("cafe_order");
-            newDocument.appendChild(cafeOrderElement);
-
-            // creo <drinks> 
-            Element drinksElement = newDocument.createElement("drinks");
-            cafeOrderElement.appendChild(drinksElement);
-
-            // todos los nodos de drink los agrego a <drinks>
-            for (Node drinkNode : allDrinkNodes) {
-                Node importedNode = newDocument.importNode(drinkNode, true);
-                drinksElement.appendChild(importedNode);
-            }
-
-            // Creo un nuevo mensaje con el documento reconstruido
-            Message newMessage = new Message(new InfoMessage(id, allDrinkNodes.size()), newDocument);
-            exitSlot.receiveData(newMessage);
-        }
+            // Crear un nuevo mensaje con el documento final y enviarlo al exitSlot
+            Message finalMessage = new Message(new InfoMessage(6, drinksElement.getChildNodes().getLength()), baseDocument);
+            exitSlot.receiveData(finalMessage);
 
         } catch (Exception ex) {
-            System.out.println(ex.getMessage());
+            System.err.println("Error en Agregator.run: " + ex.getMessage());
+            ex.printStackTrace();
         }
     }
 }

@@ -29,6 +29,9 @@ public class Cafe {
         
         SolutionPort portDBCold = new SolutionPort();
         conectorDBCold.setPort(portDBCold);
+        
+        OrderStruct struct = new OrderStruct();
+        
 
         //declaracion de slots
         Slot entradaComandas = new Slot();
@@ -86,6 +89,7 @@ public class Cafe {
 
         //tarea spliter
         Splitter splitter = new Splitter(entradaComandas, salidaSpliter);
+        splitter.setStruct(struct);
         splitter.run();
 
         //tarea distributor
@@ -208,6 +212,7 @@ public class Cafe {
         Agregator agregator = new Agregator();
         agregator.setEntrySlot(salidaMerger);
         agregator.setExitSlot(salidaAgregator);
+        agregator.setStruct(struct);
         agregator.run();
 
         System.out.println("Salida Agregator");
