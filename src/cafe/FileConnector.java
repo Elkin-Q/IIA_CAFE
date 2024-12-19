@@ -27,7 +27,7 @@ public class FileConnector extends Connector {
         Document document;
         
         try {
-            File file = new File(dirFich); //ruta fichero xml
+            File file = new File("comandas/" + dirFich +".xml"); //ruta fichero xml
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             document = dBuilder.parse(file);

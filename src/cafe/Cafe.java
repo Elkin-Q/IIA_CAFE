@@ -2,26 +2,22 @@ package cafe;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.w3c.dom.Document;
 import tasks.*;
 
 public class Cafe {
 
     public static void main(String[] args) {
+        
+        String comanda = "order6"; //nombre de la comanda con la que se desea trabajar
 
         FileConnector conector = new FileConnector();
-        conector.readFile("path_to_your_file.xml");
+        conector.readFile(comanda);
         
         DBConnector conectorDBHot = new DBConnector();
         conectorDBHot.connect();
         
         DBConnector conectorDBCold = new DBConnector();
         conectorDBCold.connect();
-        
-       /* System.out.println("********* PRUEBA DE LA BD ********");
-        Slot pruebaDB = new Slot();
-        Document prueba = conectorDB.consultMake("cafe");
-        pruebaDB.printDocument(prueba);*/
 
         FileConnector exitConector = new FileConnector();
 
@@ -218,7 +214,7 @@ public class Cafe {
         salidaAgregator.prueba();
 
         Message exitMessage =  (Message) salidaAgregator.next();
-        exitConector.generateFile(exitMessage.getData(), "solucion1");
+        exitConector.generateFile(exitMessage.getData(), "solucion_" + comanda);
         
         conectorDBHot.disconnect();
         conectorDBCold.disconnect();
